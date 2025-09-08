@@ -16,7 +16,8 @@ def contamination_scores(
 ) -> Tuple[torch.Tensor, torch.Tensor]:
     bank = torch.from_numpy(bank_vectors).to(test_fps.device)
     if test_fps.is_cuda and bank.is_cuda and cuda_available():
-        top_vals, top_idx = cosine_sim_topk(test_fps, bank, top_k)
+        with torch.cuda.amp.autocast():
+            top_vals, top_idx = cosine_sim_topk(test_fps, bank, top_k)
     else:
         test_norm = torch.nn.functional.normalize(test_fps, dim=-1)
         bank_norm = torch.nn.functional.normalize(bank, dim=-1)
